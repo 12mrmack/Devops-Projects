@@ -1,0 +1,5 @@
+---
+opensearch_version: "2.11.0"
+cluster_name: "demo-cluster"
+node_name: "node-1"
+network_host: "0.0.0.0"

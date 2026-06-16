@@ -1,0 +1,13 @@
+---
+
+- name: restart ssh
+  service:
+    name: ssh
+    state: restarted
+    
+# ---------------- Services ----------------
+- name: restart ssh
+  services:
+     - name: nginx
+       state: started
+       enabled: true

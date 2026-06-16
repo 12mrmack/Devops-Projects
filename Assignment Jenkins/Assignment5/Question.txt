@@ -1,0 +1,12 @@
+Assignment 5:
+ Create a Declarative CI  pipeline for java based project that contains various stages like
+ Code checkout
+ Run the below stages in parallel
+        1. Code stability.
+        2. Code quality analysis.
+        3. Code coverage analysis.
+ Generate a report for code quality & analysis.
+ Publish artifacts.
+ Send Slack and Email notifications.
+ The user should have the option to skip various scans in the build execution. Before publishing there should be an approval stage to be set in place to approve or deny the publication and if approved the step should execute and the user should be notified post successful/failed
+ Optional:- Repeat the same using Scripted Pipeline.

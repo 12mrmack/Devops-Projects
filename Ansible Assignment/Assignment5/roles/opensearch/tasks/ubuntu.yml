@@ -1,0 +1,15 @@
+---
+- name: Install Java on Ubuntu
+  apt:
+    name: openjdk-17-jdk
+    state: present
+    update_cache: yes
+
+- name: Download OpenSearch Debian Package
+  get_url:
+    url: "https://artifacts.opensearch.org/releases/bundle/opensearch/{{ opensearch_version }}/opensearch-{{ opensearch_version }}-linux-x64.deb"
+    dest: /tmp/opensearch.deb
+
+- name: Install OpenSearch on Ubuntu
+  apt:
+    deb: /tmp/opensearch.deb

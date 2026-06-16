@@ -1,0 +1,72 @@
+---
+- name: Setup Spring3Hibernate Application
+  hosts: web
+  become: yes
+
+  vars:
+    tomcat_path: /opt/tomcat
+    tomcat_version: apache-tomcat-7.0.108
+
+  tasks:
+
+  - name: Install Java 11
+    apt:
+      name: openjdk-11-jdk
+      state: present
+      update_cache: yes
+
+  - name: Install Maven
+    apt:
+      name: maven
+      state: present
+
+  - name: Install MySQL
+    apt:
+      name: mysql-server
+      state: present
+
+  - name: Start MySQL
+    service:
+      name: mysql
+      state: started
+      enabled: yes
+
+  - name: Create Tomcat directory
+    file:
+      path: "{{ tomcat_path }}"
+      state: directory
+
+  - name: Download Tomcat
+    get_url:
+      url: https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.108/bin/apache-tomcat-7.0.108.tar.gz
+      dest: /tmp/tomcat.tar.gz
+
+  - name: Extract Tomcat
+    unarchive:
+      src: /tmp/tomcat.tar.gz
+      dest: "{{ tomcat_path }}"
+      remote_src: yes
+
+  - name: Install Git
+    apt:
+      name: git
+      state: present
+
+  - name: Clone Spring3HibernateApp
+    git:
+      repo: https://github.com/opstree/spring3hibernate.git
+      dest: /opt/spring3hibernate
+
+  - name: Build WAR file
+    command: mvn clean package -B -DskipTests
+    args:
+      chdir: /opt/spring3hibernate
+
+  - name: Copy WAR to Tomcat
+    copy:
+      src: /opt/spring3hibernate/target/Spring3HibernateApp.war
+      dest: "{{ tomcat_path }}/{{ tomcat_version }}/webapps/"
+      remote_src: yes
+
+  - name: Start Tomcat
+    shell: "{{ tomcat_path }}/{{ tomcat_version }}/bin/startup.sh"

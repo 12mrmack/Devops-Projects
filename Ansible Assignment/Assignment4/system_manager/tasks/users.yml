@@ -1,0 +1,15 @@
+---
+
+- name: Create groups
+  group:
+    name: "{{ item.groups }}"
+    state: present
+  loop: "{{ users }}"
+
+- name: Create users
+  user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    shell: "{{ item.shell }}"
+    state: present
+  loop: "{{ users }}"

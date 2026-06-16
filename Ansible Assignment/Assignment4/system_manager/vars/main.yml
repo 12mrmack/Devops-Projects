@@ -1,0 +1,43 @@
+---
+
+# ---------------- Packages ----------------
+packages:
+  - git
+  - curl
+  - vim
+  - nginx
+
+# ---------------- Users ----------------
+users:
+  - name: dev1
+    groups: sudo
+    shell: /bin/bash
+
+  - name: dev2
+    groups: developers
+    shell: /bin/bash
+
+# ---------------- Directories ----------------
+directories:
+  - path: /opt/projects
+    owner: dev1
+    mode: "0755"
+
+  - path: /data/logs
+    owner: dev2
+    mode: "0755"
+
+# ---------------- Git Repositories ----------------
+git_repositories:
+  - repo: https://github.com/opstree/spring3hibernate.git
+    dest: /opt/projects/springapp
+    version: master
+
+# ---------------- Environment Variables ----------------
+environment_variables:
+  APP_ENV: production
+  JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+
+# ---------------- SSH Settings ----------------
+ssh_permit_root_login: "no"
+ssh_password_authentication: "no"

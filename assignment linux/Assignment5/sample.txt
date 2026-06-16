@@ -1,0 +1,3 @@
+hi NEW top
+Inserted Line
+hi Bottom

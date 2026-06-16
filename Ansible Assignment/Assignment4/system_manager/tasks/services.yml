@@ -1,0 +1,8 @@
+---
+
+- name: Manage services
+  service:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    enabled: "{{ item.enabled }}"
+  loop: "{{ services }}"

@@ -1,0 +1,7 @@
+---
+
+- name: Setup environment variables
+  template:
+    src: env.sh.j2
+    dest: /etc/profile.d/custom_env.sh
+    mode: "0755"

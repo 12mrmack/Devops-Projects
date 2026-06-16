@@ -1,0 +1,5 @@
+---
+- name: Restart OpenSearch
+  service:
+    name: opensearch
+    state: restarted

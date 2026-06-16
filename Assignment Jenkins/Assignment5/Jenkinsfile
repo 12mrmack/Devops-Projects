@@ -1,0 +1,304 @@
+pipeline {
+    agent {
+        label 'built-in'
+    }
+    tools {
+        jdk 'JDK17'
+        maven 'Maven3'
+    }
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        buildDiscarder(
+            logRotator(numToKeepStr: '10')
+        )
+    }
+    parameters {
+        booleanParam(
+            name: 'SKIP_STABILITY',
+            defaultValue: false,
+            description: 'Skip Stability Checks'
+        )
+        booleanParam(
+            name: 'SKIP_QUALITY',
+            defaultValue: false,
+            description: 'Skip SonarQube & SpotBugs Analysis'
+        )
+        booleanParam(
+            name: 'SKIP_COVERAGE',
+            defaultValue: false,
+            description: 'Skip JaCoCo Coverage Analysis'
+        )
+    }
+    environment {
+        SLACK_CHANNEL = '#devops-alerts'
+        EMAIL_RECIPIENT = '12mrmack@gmail.com'
+        SONARQUBE_ENV = 'sonarqube'
+        JUNIT_REPORT = "${BUILD_URL}JUnit_20HTML_20Report"
+        JACOCO_REPORT = "${BUILD_URL}JaCoCo_20Coverage_20Report"
+        SPOTBUGS_REPORT = "${BUILD_URL}SpotBugs_20Static_20Analysis"
+        SONAR_REPORT = "http://localhost:9000/dashboard?id=sure-fire-plugin-app"
+    }
+    stages {
+        stage('Environment Verification') {
+            steps {
+                echo 'Verifying Build Environment...'
+                sh 'java -version'
+                sh 'mvn -version'
+                sh 'git --version'
+            }
+        }
+        stage('Source Code Checkout') {
+            steps {
+                echo 'Cloning Repository...'
+                git branch: 'test',
+                url: 'https://github.com/strangecodee/sure-fire-plugin-app.git'
+            }
+        }
+        stage('Application Build') {
+            steps {
+                echo 'Building Java Application...'
+                sh 'mvn clean package -DskipTests'
+                echo 'Build Completed Successfully'
+            }
+        }
+        stage('Quality Gates & Validation') {
+            parallel {
+                stage('Code Stability Validation') {
+                    when {
+                        expression {
+                            return !params.SKIP_STABILITY
+                        }
+                    }
+                    steps {
+                        echo 'Executing Unit Tests...'
+                        sh 'mvn test surefire-report:report'
+                    }
+                    post {
+                        always {
+                            junit(
+                                allowEmptyResults: true,
+                                testResults:
+                                'target/surefire-reports/*.xml'
+                            )
+                        }
+                    }
+                }
+                stage('Static Code Quality Analysis') {
+                    when {
+                        expression {
+                            return !params.SKIP_QUALITY
+                        }
+                    }
+                    steps {
+                        echo '''
+Running SpotBugs &
+SonarQube Analysis...
+'''
+                        withSonarQubeEnv('sonarqube') {
+                            sh '''
+                                mvn spotbugs:spotbugs sonar:sonar \
+                                -Dsonar.projectKey=sure-fire-plugin-app \
+                                -Dsonar.projectName=sure-fire-plugin-app
+                                '''
+                        }
+                        echo '''
+Quality Analysis
+Completed Successfully
+'''
+                    }
+                }
+                stage('JaCoCo Coverage Analysis') {
+                    when {
+                        expression {
+                            return !params.SKIP_COVERAGE
+                        }
+                    }
+                    steps {
+                        echo '''
+Running JaCoCo
+Coverage Analysis...
+'''
+                        sh '''
+                            mvn test jacoco:report
+                           '''
+                        echo '''
+JaCoCo Coverage Report
+Generated Successfully
+'''
+                    }
+                    post {
+                        success {
+                            publishHTML([
+                                allowMissing: true,
+                                alwaysLinkToLastBuild: true,
+                                keepAll: true,
+                                reportDir:
+                                'target/site/jacoco',
+                                reportFiles:
+                                'index.html',
+                                reportName:
+                                'JaCoCo Coverage Report'
+                            ])
+                            echo '''
+JaCoCo HTML Report
+Published Successfully
+'''
+                        }
+                    }
+                }
+            }
+        }
+        stage('Reports & Artifact Management') {
+            steps {
+                echo 'Publishing Reports & Artifacts...'
+                sh 'mvn site'
+                archiveArtifacts(
+                    artifacts: 'target/*.jar',
+                    fingerprint: true
+                )
+                junit(
+                    allowEmptyResults: true,
+                    testResults:
+                    'target/surefire-reports/*.xml'
+                )
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/site',
+                    reportFiles:
+                    'surefire-report.html',
+                    reportName:
+                    'JUnit HTML Report'
+                ])
+                publishHTML([
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target',
+                    reportFiles: 'spotbugs.html',
+                    reportName:
+                    'SpotBugs Static Analysis'
+                ])
+                echo '''
+All Reports Published
+Successfully
+'''
+            }
+        }
+        stage('Approval Gate') {
+            steps {
+                script {
+                    def approval = input(
+                        id: 'ArtifactApproval',
+                        message:
+                        'Approve Artifact Publication?',
+                        parameters: [
+                            choice(
+                                choices:
+                                'Approve\nReject',
+                                description:
+                                'Select Deployment Action',
+                                name: 'Approval'
+                            )
+                        ]
+                    )
+                    if (approval == 'Reject') {
+                        error(
+                            'Artifact Publication Rejected'
+                        )
+                    }
+                }
+            }
+        }
+        stage('Artifact Publication') {
+            steps {
+                echo 'Publishing Build Artifacts...'
+                sh 'mkdir -p artifacts'
+                sh 'cp target/*.jar artifacts/'
+                archiveArtifacts(
+                    artifacts: 'artifacts/*.jar',
+                    fingerprint: true
+                )
+                echo '''
+Artifacts Published
+Successfully
+'''
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline Executed Successfully'
+            slackSend(
+                channel: '#devops-alert',
+                color: 'danger',
+                message: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            )
+            mail(
+                to: "${EMAIL_RECIPIENT}",
+                subject:
+                "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Build Successful
+
+Job Name:
+${env.JOB_NAME}
+
+Build Number:
+#${env.BUILD_NUMBER}
+
+Build URL:
+${env.BUILD_URL}
+
+====================================
+
+JUnit HTML Report:
+${env.JUNIT_REPORT}
+
+JaCoCo Coverage Report:
+${env.JACOCO_REPORT}
+
+SpotBugs Static Analysis:
+${env.SPOTBUGS_REPORT}
+
+SonarQube Dashboard:
+${env.SONAR_REPORT}
+
+====================================
+
+Generated Automatically by Jenkins CI Pipeline
+"""
+            )
+        }
+        failure {
+            echo 'Pipeline Execution Failed'
+            slackSend(
+                channel: '#devops-alert',
+                color: 'danger',
+                message: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            )
+            mail(
+                to: "${EMAIL_RECIPIENT}",
+                subject:
+                "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Build Failed
+
+Job Name:
+${env.JOB_NAME}
+
+Build Number:
+#${env.BUILD_NUMBER}
+
+Build URL:
+${env.BUILD_URL}
+"""
+            )
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

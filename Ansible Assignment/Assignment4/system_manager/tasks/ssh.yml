@@ -1,0 +1,15 @@
+---
+
+- name: Disable root login
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin {{ ssh_permit_root_login }}"
+  notify: restart ssh
+
+- name: Disable password authentication
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication {{ ssh_password_authentication }}"
+  notify: restart ssh

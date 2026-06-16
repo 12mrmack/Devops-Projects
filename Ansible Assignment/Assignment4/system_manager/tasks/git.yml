@@ -1,0 +1,7 @@
+- name: Clone repositories
+  git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+    version: "{{ item.version }}"
+    update: yes
+  loop: "{{ git_repositories }}"

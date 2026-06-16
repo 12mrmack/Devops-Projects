@@ -1,0 +1,8 @@
+---
+
+- name: System Manager Deployment
+  hosts: web
+  become: yes
+
+  roles:
+    - system_manager

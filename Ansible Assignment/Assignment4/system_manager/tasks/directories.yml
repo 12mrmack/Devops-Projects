@@ -1,0 +1,9 @@
+---
+
+- name: Create directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    mode: "{{ item.mode }}"
+  loop: "{{ directories }}"

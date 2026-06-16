@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# NAME=""
+# OPERATION=""
+# HOST=""
+# USER="" # user@host for name
+# PORT=""
+# KEY=""
+
+# $NAME|$USER|$HOST|$PORT|$KEY ### name: ssh user@host -p 22 -i 
+
+DB=~/otssh.conf
+touch "$DB"
+
+case "$1" in 
+    ls) 
+        if [ -z "$2" ]; then
+            awk -F'|' '{print $1}' $DB
+        elif [ "$2" ==  "-d" ]; then
+        
+            # DETAILS_FLAG=false
+            # shift 1
+            # while getopts "d" opt; do
+            #     case $opt in 
+            #         d) DETAILS_FLAG=true;;
+            #         \?) echo "Error: Invalid option: -$OPTARG" >&2 exit 1;;
+            #     esac
+            # done    
+            # shift $((OPTIND-1))
+
+            awk -F'|' '{name=$1; user=$2; host=$3; port=$4; key=$5; 
+            cmd="ssh"
+            if (key != "") cmd=cmd" -i "key 
+            if (port != "") cmd=cmd" -p "port
+            cmd=cmd" "user"@"host
+            print name": "cmd
+            }' $DB
+        fi
+        ;;
+    rm)
+        NAME=$2
+        sed -i "/^$NAME|/d" $DB
+        echo "Removed $NAME"
+        ;;
+
+    *)
+        NAME=""
+        HOST=""
+        USER="" # name: user@host 
+        PORT=""
+        KEY=""
+        ADD_FLAG=false
+        UPDATE_FLAG=false
+
+        while getopts "aUn:h:u:p:i:" opt; do
+            case $opt in 
+                a) ADD_FLAG=true;;
+                U) UPDATE_FLAG=true;;
+                n) NAME=$OPTARG;;
+                h) HOST=$OPTARG;;
+                u) USER=$OPTARG;;
+                p) PORT=$OPTARG;;
+                i) KEY="$OPTARG";;
+                \?) echo "Error: Invalid option: -$opt" >&2 exit 1;;
+                :) echo "Error: Option -$opt requires an argument." >&2 exit 1;;
+            esac
+        done
+        shift $((OPTIND-1))
+
+        if [ "$ADD_FLAG" == true ]; then
+            echo "$NAME|$USER|$HOST|$PORT|$KEY" >> $DB
+            echo "Added $NAME"
+        elif [ "$UPDATE_FLAG" == true ]; then
+            awk -F'|' -v name="$NAME" -v user="$USER" -v host="$HOST" -v port="$PORT" -v key="$KEY" '{ if ($1 == name) printf "%s|%s|%s|%s|%s\n", name, user, host, port, key; else print }' $DB > "$DB.tmp" && mv "$DB.tmp" $DB
+            echo "Updated $NAME"
+        fi
+
+        # ADD CONNECTION CODE HERE
+
+        if [ $ADD_FLAG != true ] && [ $UPDATE_FLAG != true ]; then
+            NAME=$1
+            LINE=$(grep -m1 "^$NAME|" "$DB")
+            if [ -z "$LINE" ]; then
+                echo "[ERROR]: Server information is not available, please add server first"
+                exit 1
+            fi
+            IFS='|' read -ra arr <<< "$LINE"
+            name="${arr[0]}"
+            user="${arr[1]}"
+            host="${arr[2]}"
+            port="${arr[3]}"
+            key="${arr[4]}"
+
+            echo "Connecting to $name on $port port as $user using $key key"
+
+            cmd=(ssh)
+            if [ -n "$key" ]; then
+                cmd+=(-i "$key")          # this is equal to cmd=("${cmd[@]}" -i "$key")
+            fi
+            if [ -n "$port" ]; then
+                cmd+=(-p "$port")
+            fi
+            cmd+=("$user@$host")         
+            echo "${cmd[*]}"    # * is used for all elements of array as single string, whereas @ means separate arguments
+            "${cmd[@]}"      ## To actually ssh, no need for EVAL here cuz using array for security
+        fi    
+
+        ;;
+esac

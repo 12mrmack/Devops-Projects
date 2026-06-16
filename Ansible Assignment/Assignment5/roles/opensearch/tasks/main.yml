@@ -1,0 +1,43 @@
+---
+- name: Show OS Distribution and Version
+  debug:
+    msg:
+      - "OS: {{ ansible_distribution }}"
+      - "Version: {{ ansible_distribution_version }}"
+
+- name: Include Ubuntu Tasks
+  include_tasks: ubuntu.yml
+  when: ansible_os_family == "Debian"
+
+- name: Include CentOS Tasks
+  include_tasks: centos.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Deploy OpenSearch Configuration
+  template:
+    src: opensearch.yml.j2
+    dest: /etc/opensearch/opensearch.yml
+  notify: Restart OpenSearch
+
+- name: Create opensearch user
+  user:
+    name: opensearch
+    shell: /bin/bash
+    system: yes
+
+- name: Set ownership for OpenSearch directories
+  file:
+    path: "{{ item }}"
+    owner: opensearch
+    group: opensearch
+    recurse: yes
+  loop:
+    - /etc/opensearch
+    - /var/lib/opensearch
+    - /var/log/opensearch
+    
+- name: Enable and Start OpenSearch
+  service:
+    name: opensearch
+    state: started
+    enabled: yes
