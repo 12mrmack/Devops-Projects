@@ -22,12 +22,12 @@ maqbool.codeCatalyst.com
 ```bash
 curl http://localhost
 ```
-![]('images/when-not-in-time.png')
-![]('images/10-12.png')
-![]('images/4-6.png')
+![](images/when-not-in-time.png)
+![](images/10-12.png)
+![](images/4-6.png)
 
 # Part 2: Permission-Based Container
-![]('images/permission.png')
+![](images/permission.png)
 
 
 
