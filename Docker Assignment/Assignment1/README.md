@@ -22,7 +22,7 @@ maqbool.codeCatalyst.com
 ```bash
 curl http://localhost
 ```
-![]('images/when not in time.png')
+![]('images/when-not-in-time.png')
 ![]('images/10-12.png')
 ![]('images/4-6.png')
 
