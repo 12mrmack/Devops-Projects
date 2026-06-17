@@ -15,17 +15,17 @@ The architecture covers horizontal scaling, image management, self-healing setup
   sudo apt update && sudo apt install nginx -y
   ```
 
-  ![](<Screenshot 2.png>)
+  ![](images/Screenshot-2.png)
 
-  ![](<Screenshot 3.png>)
+  ![](images/Screenshot-3.png)
 
-  ![](<Screenshot 4.png>)
+  ![](images/Screenshot-4.png)
 
-  ![](<Screenshot 5.png>)
+  ![](images/Screenshot-5.png)
 
-  ![](<Screenshot 6.png>)
+  ![](images/Screenshot-6.png)
 
-  ![](<Screenshot 7.png>)
+  ![](images/Screenshot-7.png)
 
 ### Day 2: Decoupled Web-Hosting Assets via AWS S3 Storage Pipelines
 
@@ -37,13 +37,13 @@ We avoided storing hardcoded access keys on the machines. Instead, an **IAM Inst
 #### 2. VCS Repository to S3 Synchronization
 From the EC2 build workspace, the required user assets were cloned out of Git and synchronized directly to our S3 storage bucket using the AWS CLI:
 
-![](<Screenshot 8.png>)
+![](images/Screenshot-8.png)
 
-![](<Screenshot 9.png>)
+![](images/Screenshot-9.png)
 
-![](<Screenshot 10.png>)
+![](images/Screenshot-10.png)
 
-![](<Screenshot 11.png>)
+![](images/Screenshot-11.png)
 
 ### Day 3: Self-Healing Resilience Validation
 To verify the self-healing capability of the Auto Scaling Group when infrastructure nodes encounter an unrecoverable failure:
@@ -54,15 +54,15 @@ Stopped the backend engine on an active instance: **sudo systemctl stop nginx**
 #### Observations
 The ALB target group health check quickly registered a port 80 timeout and marked the host as Unhealthy. Traffic was immediately rerouted away from the broken server. The ASG then terminated the faulty node and spun up a healthy instance automatically to maintain the fleet's desired size.
 
-![](<Screenshot 12.png>)
+![](images/Screenshot-12.png)
 
-![](<Screenshot 13.png>)
+![](images/Screenshot-13.png)
 
-![](<Screenshot 14.png>)
+![](images/Screenshot-14.png)
 
-![](<Screenshot 15.png>)
+![](images/Screenshot-15.png)
 
-![](<Screenshot 16.png>)
+![](images/Screenshot-16.png)
 
 ### Day 4: Hardened Subnets & Path-Based ALB Routing
 To minimize attack vectors, compute nodes are placed in private network zones.
@@ -79,13 +79,13 @@ Target Group 1 (tg-ninja1): Directs requests containing the path query /ninja1 t
 
 Target Group 2 (tg-ninja2): Directs requests containing the path query /ninja2 to the second EC2 node, displaying Image-2.
 
-![](<Screenshot 17.png>)
+![](images/Screenshot-17.png)
 
-![](<Screenshot 18.png>)
+![](images/Screenshot-18.png)
 
-![](<Screenshot 19.png>)
+![](images/Screenshot-19.png)
 
-![](<Screenshot 20.png>)
+![](images/Screenshot-20.png)
 
 ### Day 5: Granular Environment Isolation and IAM S3 Bucket Policies
 The corporate landscape requires a clear data boundary inside the us-east-1 storage container to prevent cross-contamination between folders.
@@ -96,10 +96,10 @@ Split into s3://client-assets-day-5-maqbool/prod/ and s3://client-assets-day-5-m
 #### Applied Safeguards
 Configured strict boundaries using a combination of IAM User Restriction Policies and an S3 Bucket Access Control Document. The design blocks the restricted IAM User from accessing /prod while allowing full data management permissions in /nonprod. It also allows our EC2 application role context to communicate with both paths.
 
-![](<Screenshot 21.png>)
+![](images/Screenshot-21.png)
 
-![](<Screen23.png>)
+![](images/Screen23.png)
 
-![](<Screen22.png>)
+![](images/Screen22.png)
 
-![](<Screen24.png>)
+![](images/Screen24.png)

@@ -61,14 +61,14 @@ Allows private instances to access the internet for:
 - Distributes requests across application servers
 - Improves availability and fault tolerance
      
-![](images/Load Balancer.png)
+![](images/Load-Balancer.png)
 
 ## Target Group
 - Contains application instances
 - Performs health checks
 - Routes traffic only to healthy targets 
 
-![](images/health check.png)
+![](images/health-check.png)
 
 ## Auto Scaling Group (ASG)
 Automatically:
@@ -76,13 +76,13 @@ Automatically:
 - Removes instances during low load
 - Maintains desired capacity
 
-![](images/Auto Scalling Group.png)
+![](images/Auto-Scalling-Group.png)
 
 ## Bastion Host
 Secure entry point for administrators to access private instances.
 
-![](images/ssh priavte instance.png)
-![](images/first desire instance created.png)
+![](images/ssh-priavte-instance.png)
+![](images/first-desire-instance-created.png)
 
 ## Security Groups
 ### ALB Security Group
@@ -164,20 +164,19 @@ Scale-Out Trigger:
 Scale-In Trigger:
 - CPU Utilization decreases below threshold
 
-![](images/increase load.png)
-![](images/after load increase auto scalling starts.png)
-![](images/remove load.png)
-![](images/cooling download after load decrease.png)
+![](images/increase-load.png)
+![](images/after-load-increase-auto-scalling-starts.png)
+![](images/remove-load.png)
+![](images/cooling-after-load-decrease.png)
 
-![](images/app runngin with load balancer.png)
+![](images/app-with-load-balancer.png)
 
 ---
 
 # Scaling Strategy
 Use load template in autoscalling
 
-![](images/Launch Template.png)
-![](images/launch template.png)
+![](images/Launch-Template.png)
 
 ----
 

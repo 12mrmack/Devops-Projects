@@ -18,13 +18,13 @@ The existing application is terminated and replaced with a new version.
 6. Terminate old EC2.
 7. Launch a new EC2 using the V2 AMI.
 
-![]('images/1. data coming from s3.png')
-![]('images/1. installing v2 ec2.png')
-![]('images/1. source code website.png')
-![]('images/1. terminated v1.png')
-![]('images/1. web accessing data from s3 with v1.png')
-![]('images/1 website v2 on newer ec2.png')
-![]('images/2 launch template v2 rolling update.png')
+![](images/1.-data-coming-from-s3.png)
+![](images/1.-installing-v2-ec2.png)
+![](images/1.-source-code-website.png)
+![](images/1.-terminated-v1.png)
+![](images/1.-web-accessing-data-from-s3-with-v1.png)
+![](images/1-website-v2-on-newer-ec2.png)
+![](images/2-launch-template-v2-rolling-update.png)
 
 ## Advantages
 - Simple implementation
@@ -50,13 +50,13 @@ Instances are updated gradually without taking down the entire application.
 6. Update ASG.
 7. Perform Instance Refresh.
 
-![]('images/2. rolling udpate v2 updted in asg.png')
-![]('images/2. rolling update v1.png')
-![]('images/2. rolling update v2.png')
-![]('images/2. v2 selected in ASG.png')
-![]('images/2. website v1 zip.png')
-![]('images/2. website v2 zip.png')
-![]('images/2 launch template v2 rolling update.png')
+![](images/2.-rolling-udpat-v2-updted-in-asg.png)
+![](images/2.-rolling-update-v1.png)
+![](images/2.-rolling-update-v2.png)
+![](images/2.-v2-selected-in-ASG.png)
+![](images/2.-website-v1-zip.png)
+![](images/2.-website-v2-zip.png)
+![](images/2-launch-template-v2-update.png)
 
 
 ## Advantages
@@ -84,12 +84,12 @@ Maintain two identical environments.
 4. Validate application.
 5. Switch ALB traffic to Green.
 
-![]('images/3. blue server hitting now.png')
-![]('images/3. blue server hitting now 1.png')
-![]('images/3. green - blue servers.png')
-![]('images/3.green server.png')
-![]('images/3. green server hittting now.png')
-![]('images/3. green server htting now with 100 % users.png')
+![](images/3.-blue-server-hitting-now.png)
+![](images/3.-blue-server-hitting-now-1.png)
+![](images/3.-green---blue-servers.png)
+![](images/3.green-server.png)
+![](images/3.-green-server-hittting-now.png)
+![](images/3.-green-server-htting-now-with-100-%-users.png)
 
 ## S3 Usage
 
@@ -130,7 +130,7 @@ Release new application version to a small percentage of users first.
 5. Monitor logs and metrics.
 6. Increase traffic gradually.
 
-![]('images/3. green server htting now with 100 % users.png')
+![](images/3.-green-server-htting-now-with-100-%-users.png)
 
 we change into forword target group into 90% green and 10% blue so this will work as canary depoyment
 
@@ -163,7 +163,7 @@ Examples:
 - Cookie-based routing
 
 
-![]('images/3. green server htting now with 100 % users.png')
+![](images/3. green server htting now with 100 % users.png)
 
 we change into forword target group into 90% green and 10% blue so this will work as A/B depoyment
 
