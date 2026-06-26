@@ -1,6 +1,3 @@
-# Docker_34
-contains assignment of Topic Docker
-=======
 # Assignment 6 - OT Microservices using ReplicaSet and Deployment
 
 ## Objective
