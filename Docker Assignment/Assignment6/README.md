@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Docker_34
 contains assignment of Topic Docker
 =======
@@ -72,4 +71,3 @@ ReplicaSet/Deployment automatically creates a new Pod.
     updates, and rollback.
 -   The OT-Microservices application was deployed successfully using
     both approaches.
->>>>>>> 902b952 (all docker and k8s assignments)
