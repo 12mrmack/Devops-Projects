@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empms-frontend
+  labels:
+    app: empms-frontend
+spec:
+  containers:
+  - name: frontend
+    image: 12mrmack/empms-frontend:v1
+    ports:
+    - containerPort: 3000

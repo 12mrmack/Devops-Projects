@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empms-employee
+  labels:
+    app: empms-employee
+spec:
+  containers:
+  - name: employee
+    image: 12mrmack/empms-employee:v1
+    ports:
+    - containerPort: 8083
+    env:
+    - name: CONFIG_FILE
+      value: "/root/config/config.yaml"
+    - name: ELASTIC_APM_ENABLED
+      value: "false"

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: empms-attendance
+  labels:
+    app: empms-attendance
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: empms-attendance
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: empms-attendance
+    spec:
+      containers:
+      - name: attendance
+        image: 12mrmack/empms-attendance:v1
+        ports:
+        - containerPort: 8081
+        env:
+        - name: CONFIG_FILE
+          value: "/app/config/config.yaml"
+        - name: ELASTIC_APM_ENABLED
+          value: "false"

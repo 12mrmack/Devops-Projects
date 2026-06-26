@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empms-attendance
+  labels:
+    app: empms-attendance
+spec:
+  containers:
+  - name: attendance
+    image: 12mrmack/empms-attendance:v1
+    ports:
+    - containerPort: 8081
+    env:
+    - name: CONFIG_FILE
+      value: "/app/config/config.yaml"
+    - name: ELASTIC_APM_ENABLED
+      value: "false"

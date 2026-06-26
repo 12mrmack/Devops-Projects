@@ -1,0 +1,158 @@
+---
+version: '3.2'
+
+services:
+  empms-es:
+    image: 12mrmack/empms-es:v1
+    volumes:
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+    networks:
+      - ot-microservices
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.6.2
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://empms-es:9200"]'
+    depends_on:
+      - empms-es
+    networks:
+      - ot-microservices
+
+  empms-db:
+    image: 12mrmack/empm-db:v1
+    ports:
+      - "3307:3306"
+    volumes:
+      - type: volume
+        source: mysql
+        target: /var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_DATABASE: "attendance_db"
+    networks:
+      - ot-microservices
+
+  empms-attendance:
+    image: 12mrmack/empms-attendance:v1
+    ports:
+      - "8081:8081"
+    environment:
+      CONFIG_FILE: "/app/config/config.yaml"
+      ELASTIC_APM_ENABLED: "false"
+    networks:
+      - ot-microservices
+    depends_on:
+      - empms-db
+
+  empms-salary:
+    image: 12mrmack/empms-salary:v1
+    ports:
+      - "8084:8080"
+    environment:
+      SPRING_ELASTICSEARCH_REST_URIS: "empms-es:9200"
+      SPRING_ELASTICSEARCH_REST_USERNAME: elastic
+      SPRING_ELASTICSEARCH_REST_PASSWORD: elastic
+      ELASTIC_APM_ENABLED: "false"
+    networks:
+      - ot-microservices
+    depends_on:
+      - empms-es
+
+  empms-employee:
+    image: 12mrmack/empms-employee:v1
+    ports:
+      - "8083:8083"
+    environment:
+      CONFIG_FILE: "/root/config/config.yaml"
+      ELASTIC_APM_ENABLED: "false"
+    networks:
+      - ot-microservices
+    depends_on:
+      - empms-es
+
+  empms-notification:
+    image: 12mrmack/empms-notification:v1
+    environment:
+      CONFIG_FILE: "/app/config.yaml"
+    networks:
+      - ot-microservices
+    depends_on:
+      - empms-es
+
+  empms-frontend:
+    image: 12mrmack/empms-frontend:v1
+    ports:
+      - "3000:3000"
+    networks:
+      - ot-microservices
+
+  empms-traefik:
+    image: traefik:v2.9
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        cat > /tmp/dynamic.yml << 'EOF'
+        http:
+          routers:
+            empms-employee:
+              rule: "PathPrefix(`/employee/`)"
+              service: empms-employee
+              priority: 20
+            empms-attendance:
+              rule: "PathPrefix(`/attendance/`)"
+              service: empms-attendance
+              priority: 20
+            empms-salary:
+              rule: "PathPrefix(`/salary/`)"
+              service: empms-salary
+              priority: 20
+            empms-frontend:
+              rule: "PathPrefix(`/`)"
+              service: empms-frontend
+              priority: 1
+          services:
+            empms-employee:
+              loadBalancer:
+                servers:
+                  - url: "http://empms-employee:8083"
+            empms-attendance:
+              loadBalancer:
+                servers:
+                  - url: "http://empms-attendance:8081"
+            empms-salary:
+              loadBalancer:
+                servers:
+                  - url: "http://empms-salary:8080"
+            empms-frontend:
+              loadBalancer:
+                servers:
+                  - url: "http://empms-frontend:3000"
+        EOF
+        traefik --api.insecure=true --entrypoints.web.address=:80 --providers.file.filename=/tmp/dynamic.yml
+    ports:
+      - "80:80"
+      - "8088:8080"
+    depends_on:
+      - empms-frontend
+      - empms-attendance
+      - empms-salary
+      - empms-employee
+    networks:
+      - ot-microservices
+
+networks:
+  ot-microservices:
+    driver: bridge
+
+volumes:
+  elasticsearch:
+  mysql:

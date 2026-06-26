@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: empms-frontend
+  labels:
+    app: empms-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: empms-frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: empms-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 12mrmack/empms-frontend:v1
+        ports:
+        - containerPort: 3000

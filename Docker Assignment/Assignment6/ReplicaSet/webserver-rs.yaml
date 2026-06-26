@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: empms-webserver
+  labels:
+    app: empms-webserver
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: empms-webserver
+  template:
+    metadata:
+      labels:
+        app: empms-webserver
+    spec:
+      containers:
+      - name: webserver
+        image: traefik:v2.11
+        ports:
+        - containerPort: 80
+          name: web
+        - containerPort: 8080
+          name: admin
+        volumeMounts:
+        - name: config
+          mountPath: /etc/traefik
+      volumes:
+      - name: config
+        configMap:
+          name: traefik-config

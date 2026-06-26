@@ -1,0 +1,42 @@
+http:
+  routers:
+    empms-employee:
+      rule: "PathPrefix(`/employee/`)"
+      service: empms-employee
+      priority: 20
+
+    empms-attendance:
+      rule: "PathPrefix(`/attendance/`)"
+      service: empms-attendance
+      priority: 20
+
+    empms-salary:
+      rule: "PathPrefix(`/salary/`)"
+      service: empms-salary
+      priority: 20
+
+    empms-frontend:
+      rule: "PathPrefix(`/`)"
+      service: empms-frontend
+      priority: 1
+
+  services:
+    empms-employee:
+      loadBalancer:
+        servers:
+          - url: "http://empms-employee:8083"
+
+    empms-attendance:
+      loadBalancer:
+        servers:
+          - url: "http://empms-attendance:8081"
+
+    empms-salary:
+      loadBalancer:
+        servers:
+          - url: "http://empms-salary:8080"
+
+    empms-frontend:
+      loadBalancer:
+        servers:
+          - url: "http://empms-frontend:3000"

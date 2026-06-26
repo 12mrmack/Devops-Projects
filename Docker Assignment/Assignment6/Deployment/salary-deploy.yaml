@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: empms-salary
+  labels:
+    app: empms-salary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: empms-salary
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: empms-salary
+    spec:
+      containers:
+      - name: salary
+        image: 12mrmack/empms-salary:v1
+        ports:
+        - containerPort: 8082
+        env:
+        - name: SPRING_ELASTICSEARCH_REST_URIS
+          value: "empms-es:9200"
+        - name: SPRING_ELASTICSEARCH_REST_USERNAME
+          value: "elastic"
+        - name: SPRING_ELASTICSEARCH_REST_PASSWORD
+          value: "elastic"
+        - name: ELASTIC_APM_ENABLED
+          value: "false"

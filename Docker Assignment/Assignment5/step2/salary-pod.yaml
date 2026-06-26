@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empms-salary
+  labels:
+    app: empms-salary
+spec:
+  containers:
+  - name: salary
+    image: 12mrmack/empms-salary:v1
+    ports:
+    - containerPort: 8080
+    env:
+    - name: SPRING_ELASTICSEARCH_REST_URIS
+      value: "empms-es:9200"
+    - name: SPRING_ELASTICSEARCH_REST_USERNAME
+      value: "elastic"
+    - name: SPRING_ELASTICSEARCH_REST_PASSWORD
+      value: "elastic"
+    - name: ELASTIC_APM_ENABLED
+      value: "false"

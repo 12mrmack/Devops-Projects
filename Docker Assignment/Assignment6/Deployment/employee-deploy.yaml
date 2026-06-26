@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: empms-employee
+  labels:
+    app: empms-employee
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: empms-employee
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: empms-employee
+    spec:
+      containers:
+      - name: employee
+        image: 12mrmack/empms-employee:v1
+        ports:
+        - containerPort: 8083
+        env:
+        - name: CONFIG_FILE
+          value: "/root/config/config.yaml"
+        - name: ELASTIC_APM_ENABLED
+          value: "false"

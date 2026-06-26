@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empms-attendance-db
+  labels:
+    app: empms-attendance-db
+spec:
+  hostAliases:
+  - ip: "127.0.0.1"
+    hostnames:
+    - "empms-db"
+  containers:
+  - name: db
+    image: 12mrmack/empm-db:v1
+    ports:
+    - containerPort: 3306
+      name: mysql
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: "password"
+    - name: MYSQL_DATABASE
+      value: "attendance_db"
+  - name: attendance
+    image: 12mrmack/empms-attendance:v1
+    ports:
+    - containerPort: 8081
+    env:
+    - name: CONFIG_FILE
+      value: "/app/config/config.yaml"
+    - name: ELASTIC_APM_ENABLED
+      value: "false"

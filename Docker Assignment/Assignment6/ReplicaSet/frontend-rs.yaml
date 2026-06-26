@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: empms-frontend
+  labels:
+    app: empms-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: empms-frontend
+  template:
+    metadata:
+      labels:
+        app: empms-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 12mrmack/empms-frontend:v1
+        ports:
+        - containerPort: 3000

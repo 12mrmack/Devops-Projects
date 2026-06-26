@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Void Studio — Digital Craft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:   #080C14;
+    --indigo: #4F46E5;
+    --violet: #7C3AED;
+    --pearl:  #F8F9FF;
+    --slate:  #8892A4;
+    --gold:   #F59E0B;
+    --card:   #0D1220;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--pearl);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 4rem;
+    backdrop-filter: blur(18px);
+    background: rgba(8,12,20,0.6);
+    border-bottom: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.35rem; font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--pearl) 40%, var(--indigo));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--slate); text-decoration: none; font-size: 0.875rem;
+    font-weight: 500; letter-spacing: 0.02em; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--pearl); }
+  .nav-cta {
+    background: var(--indigo); color: #fff; border: none;
+    padding: 0.6rem 1.4rem; border-radius: 8px; font-size: 0.875rem;
+    font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { background: var(--violet); transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 8rem 2rem 4rem;
+    overflow: hidden;
+  }
+  #canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 1.5rem; position: relative;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 800; line-height: 1.0;
+    letter-spacing: -0.04em;
+    position: relative;
+    max-width: 18ch;
+  }
+  .hero-title em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--indigo), var(--gold) 90%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub {
+    margin-top: 1.75rem; max-width: 48ch;
+    color: var(--slate); font-size: 1.1rem; line-height: 1.75;
+    position: relative;
+  }
+  .hero-actions {
+    margin-top: 2.75rem; display: flex; gap: 1rem;
+    justify-content: center; flex-wrap: wrap; position: relative;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--indigo), var(--violet));
+    color: #fff; border: none; padding: 0.85rem 2rem;
+    border-radius: 10px; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    box-shadow: 0 0 32px rgba(79,70,229,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 48px rgba(79,70,229,0.6); }
+  .btn-ghost {
+    background: transparent; color: var(--pearl);
+    border: 1px solid var(--border); padding: 0.85rem 2rem;
+    border-radius: 10px; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--indigo); background: rgba(79,70,229,0.08); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex; justify-content: center; gap: 0; flex-wrap: wrap;
+    margin: 0 auto; max-width: 900px;
+    background: var(--card);
+    border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; position: relative; z-index: 2;
+    transform: translateY(-2rem);
+  }
+  .stat {
+    flex: 1; min-width: 160px; padding: 2rem 1.5rem;
+    text-align: center; border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.25rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--pearl), var(--indigo));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 0.8rem; color: var(--slate); margin-top: 0.25rem; letter-spacing: 0.05em; }
+
+  /* ── SECTIONS ── */
+  section { padding: 6rem 4rem; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--indigo); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+    max-width: 22ch;
+  }
+  .section-title em {
+    font-style: normal; color: var(--gold);
+  }
+  .section-desc {
+    margin-top: 1rem; color: var(--slate); max-width: 54ch; line-height: 1.8;
+  }
+
+  /* ── SERVICES ── */
+  #services .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem; margin-top: 3.5rem;
+  }
+  .service-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    cursor: default;
+  }
+  .service-card:hover {
+    border-color: rgba(79,70,229,0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(79,70,229,0.12);
+  }
+  .service-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(79,70,229,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.25rem;
+  }
+  .service-card h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+    margin-bottom: 0.6rem; letter-spacing: -0.02em;
+  }
+  .service-card p { color: var(--slate); font-size: 0.9rem; line-height: 1.7; }
+
+  /* ── WORK ── */
+  #work .section-header { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  #work .work-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.25rem; margin-top: 3rem;
+  }
+  .work-card {
+    border-radius: 16px; overflow: hidden;
+    position: relative; aspect-ratio: 4/3;
+    background: var(--card); border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .work-card.tall { grid-row: span 2; aspect-ratio: auto; }
+  .work-thumb {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform 0.5s ease;
+  }
+  .work-card:hover .work-thumb { transform: scale(1.04); }
+  .work-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(8,12,20,0.9) 30%, transparent);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 1.5rem; opacity: 0; transition: opacity 0.3s;
+  }
+  .work-card:hover .work-overlay { opacity: 1; }
+  .work-tag {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem;
+  }
+  .work-card h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; }
+
+  /* work placeholders */
+  .work-bg-1 { background: linear-gradient(135deg, #1a0533 0%, #3b0764 50%, #1e1b4b 100%); }
+  .work-bg-2 { background: linear-gradient(135deg, #0f1629 0%, #1e3a5f 60%, #0c2447 100%); }
+  .work-bg-3 { background: linear-gradient(135deg, #0a1628 0%, #1a4a3a 60%, #052e16 100%); }
+  .work-bg-4 { background: linear-gradient(135deg, #1c0a07 0%, #4a1942 60%, #1a0f1f 100%); }
+
+  .work-visual {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; transition: transform 0.5s ease;
+  }
+  .work-card:hover .work-visual { transform: scale(1.06); }
+
+  /* ── PROCESS ── */
+  #process { border-top: 1px solid var(--border); }
+  .process-steps {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem; margin-top: 3.5rem;
+  }
+  .step { position: relative; }
+  .step-num {
+    font-family: 'Syne', sans-serif; font-size: 3.5rem; font-weight: 800;
+    color: rgba(79,70,229,0.12); line-height: 1; margin-bottom: 1rem;
+  }
+  .step h3 { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .step p { color: var(--slate); font-size: 0.88rem; line-height: 1.75; }
+  .step-line {
+    position: absolute; top: 1.75rem; right: 0;
+    width: calc(100% - 2rem); height: 1px;
+    background: linear-gradient(to right, var(--indigo), transparent);
+  }
+  .step:last-child .step-line { display: none; }
+
+  /* ── TESTIMONIAL ── */
+  #testimonials { border-top: 1px solid var(--border); }
+  .testi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-top: 3.5rem; }
+  .testi-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem;
+    transition: border-color 0.25s;
+  }
+  .testi-card:hover { border-color: rgba(79,70,229,0.4); }
+  .stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 1rem; letter-spacing: 0.1em; }
+  .testi-card blockquote {
+    color: var(--pearl); font-size: 0.95rem; line-height: 1.75;
+    font-style: italic; margin-bottom: 1.5rem; border: none; padding: 0;
+  }
+  .testi-author { display: flex; align-items: center; gap: 0.85rem; }
+  .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; font-weight: 700; flex-shrink: 0;
+  }
+  .avatar-1 { background: linear-gradient(135deg, #4F46E5, #7C3AED); }
+  .avatar-2 { background: linear-gradient(135deg, #059669, #10B981); }
+  .avatar-3 { background: linear-gradient(135deg, #DC2626, #F59E0B); }
+  .testi-name { font-weight: 600; font-size: 0.9rem; }
+  .testi-role { font-size: 0.78rem; color: var(--slate); }
+
+  /* ── CTA ── */
+  #cta {
+    margin: 0 4rem 6rem; border-radius: 24px; padding: 5rem 4rem;
+    background: linear-gradient(135deg, #0f1340 0%, #1a0d35 50%, #0a1628 100%);
+    border: 1px solid rgba(79,70,229,0.3);
+    text-align: center; position: relative; overflow: hidden;
+    max-width: 1200px; margin-left: auto; margin-right: auto;
+  }
+  #cta::before {
+    content: ''; position: absolute;
+    top: -60%; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(79,70,229,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #cta .section-title { max-width: none; }
+  #cta .section-desc { margin: 1rem auto 0; }
+  #cta .hero-actions { margin-top: 2.5rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 4rem; display: flex;
+    align-items: center; justify-content: space-between; flex-wrap: gap;
+    gap: 1rem;
+  }
+  .footer-links { display: flex; gap: 2rem; list-style: none; }
+  .footer-links a { color: var(--slate); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--pearl); }
+  .footer-copy { font-size: 0.82rem; color: var(--slate); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 1.5rem; }
+    #work .work-grid { grid-template-columns: 1fr; }
+    .work-card.tall { grid-row: auto; }
+    footer { padding: 2rem 1.5rem; flex-direction: column; text-align: center; }
+    #cta { margin: 0 1.5rem 4rem; padding: 3rem 1.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">void.</div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#testimonials">Clients</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Start a project</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="canvas"></canvas>
+  <p class="hero-eyebrow reveal">✦ &nbsp; Award-winning digital studio &nbsp; ✦</p>
+  <h1 class="hero-title reveal">We craft <em>digital experiences</em> that move people.</h1>
+  <p class="hero-sub reveal">Void Studio blends sharp strategy with obsessive craft — building brands, websites, and products that earn attention and hold it.</p>
+  <div class="hero-actions reveal">
+    <button class="btn-primary" onclick="document.getElementById('work').scrollIntoView({behavior:'smooth'})">View our work</button>
+    <button class="btn-ghost" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Let's talk</button>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar reveal">
+  <div class="stat"><div class="stat-num" data-target="120">0</div><div class="stat-label">Projects delivered</div></div>
+  <div class="stat"><div class="stat-num" data-target="98">0</div><div class="stat-label">Client satisfaction %</div></div>
+  <div class="stat"><div class="stat-num" data-target="14">0</div><div class="stat-label">Industry awards</div></div>
+  <div class="stat"><div class="stat-num" data-target="6">0</div><div class="stat-label">Years of craft</div></div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="reveal">
+    <p class="section-label">What we do</p>
+    <h2 class="section-title">Every project starts with a <em>clear purpose.</em></h2>
+    <p class="section-desc">We don't do generic. Every engagement is built around a precise outcome — for your users, your business, and your market.</p>
+  </div>
+  <div class="grid">
+    <div class="service-card reveal">
+      <div class="service-icon">🎨</div>
+      <h3>Brand Identity</h3>
+      <p>Strategy-first brand systems — logo, color, type, voice — built to be unmistakable in your category and durable over time.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🖥️</div>
+      <h3>Web Design & Dev</h3>
+      <p>Performant, beautifully designed websites built with clean code, fast load times, and interaction details people notice and remember.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">📱</div>
+      <h3>Product Design</h3>
+      <p>End-to-end UX/UI for digital products — research, wireframes, hi-fi design, and developer handoff with zero ambiguity.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🚀</div>
+      <h3>Growth & Motion</h3>
+      <p>Marketing campaigns, landing pages, and motion design that convert browsers into buyers and users into advocates.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">⚙️</div>
+      <h3>No-Code & Webflow</h3>
+      <p>Fully editable, CMS-powered websites on Webflow or Framer — so your team can update content without touching a line of code.</p>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">💡</div>
+      <h3>Strategy & Consulting</h3>
+      <p>Audits, positioning workshops, and competitive research to sharpen your digital direction before a single pixel is placed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work" style="border-top: 1px solid var(--border)">
+  <div class="section-header reveal">
+    <div>
+      <p class="section-label">Selected work</p>
+      <h2 class="section-title">Built with <em>intent.</em></h2>
+    </div>
+    <button class="btn-ghost" style="white-space:nowrap">View all projects →</button>
+  </div>
+  <div class="work-grid">
+    <div class="work-card tall reveal">
+      <div class="work-visual work-bg-1">🌌</div>
+      <div class="work-overlay">
+        <p class="work-tag">Brand · Web</p>
+        <h3>Nova Finance — Rebrand & Platform</h3>
+      </div>
+    </div>
+    <div class="work-card reveal">
+      <div class="work-visual work-bg-2">🏙️</div>
+      <div class="work-overlay">
+        <p class="work-tag">Product Design</p>
+        <h3>Skyline Dashboard UI</h3>
+      </div>
+    </div>
+    <div class="work-card reveal">
+      <div class="work-visual work-bg-3">🌿</div>
+      <div class="work-overlay">
+        <p class="work-tag">E-commerce · Motion</p>
+        <h3>Verdant — Sustainable Goods</h3>
+      </div>
+    </div>
+    <div class="work-card reveal" style="grid-column: span 2;">
+      <div class="work-visual work-bg-4" style="height:260px">🎭</div>
+      <div class="work-overlay">
+        <p class="work-tag">Campaign · Brand</p>
+        <h3>Phantom Records — Artist Launch Campaign</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="reveal">
+    <p class="section-label">How we work</p>
+    <h2 class="section-title">A process that <em>never skips</em> the hard parts.</h2>
+  </div>
+  <div class="process-steps">
+    <div class="step reveal">
+      <div class="step-num">01</div>
+      <div class="step-line"></div>
+      <h3>Discover</h3>
+      <p>We start with deep listening — your goals, your users, your competitive landscape. No assumptions, no templates.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">02</div>
+      <div class="step-line"></div>
+      <h3>Define</h3>
+      <p>We translate insights into a sharp creative brief, success criteria, and a structure you can hold us accountable to.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">03</div>
+      <div class="step-line"></div>
+      <h3>Design</h3>
+      <p>Iterative, feedback-driven design sprints. You see real work early and often — not a big reveal at the end.</p>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">04</div>
+      <h3>Deliver</h3>
+      <p>Pixel-perfect handoff, performance QA, and post-launch support. We stay until it's right — not just done.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="reveal">
+    <p class="section-label">Client voices</p>
+    <h2 class="section-title">What our partners <em>actually say.</em></h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <blockquote>"Void didn't just design our site — they redesigned how we think about our brand. The team's strategic depth matched their craft, which is rare."</blockquote>
+      <div class="testi-author">
+        <div class="avatar avatar-1">S</div>
+        <div><div class="testi-name">Sarah Kim</div><div class="testi-role">CEO, Nova Finance</div></div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <blockquote>"We tripled our conversion rate within 60 days of launch. Every decision they made was rooted in user behavior and business impact, not aesthetics alone."</blockquote>
+      <div class="testi-author">
+        <div class="avatar avatar-2">M</div>
+        <div><div class="testi-name">Marcus L.</div><div class="testi-role">Head of Growth, Verdant</div></div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars">★★★★★</div>
+      <blockquote>"The campaign they built for our artist launch generated 2.4M impressions in the first week. Void understands culture, not just design."</blockquote>
+      <div class="testi-author">
+        <div class="avatar avatar-3">J</div>
+        <div><div class="testi-name">James O.</div><div class="testi-role">A&R Director, Phantom Records</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div id="cta" class="reveal">
+  <p class="section-label">Ready when you are</p>
+  <h2 class="section-title">Your next great project<br />starts with one conversation.</h2>
+  <p class="section-desc">We take on a limited number of new partners each quarter. Tell us about your project — we'll tell you if we're the right fit.</p>
+  <div class="hero-actions">
+    <button class="btn-primary">Book a free strategy call</button>
+    <button class="btn-ghost">hello@voidstudio.co</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">void.</div>
+  <ul class="footer-links">
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Twitter / X</a></li>
+    <li><a href="#">LinkedIn</a></li>
+    <li><a href="#">Dribbble</a></li>
+  </ul>
+  <p class="footer-copy">© 2026 Void Studio. All rights reserved.</p>
+</footer>
+
+<script>
+/* ── PARTICLE CANVAS ── */
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], mouse = { x: -999, y: -999 };
+const COLORS = ['#4F46E5', '#7C3AED', '#F59E0B', '#818CF8', '#C4B5FD'];
+
+function resize() {
+  W = canvas.width = canvas.offsetWidth;
+  H = canvas.height = canvas.offsetHeight;
+}
+resize(); window.addEventListener('resize', () => { resize(); initParticles(); });
+
+function Particle() {
+  this.x = Math.random() * W;
+  this.y = Math.random() * H;
+  this.vx = (Math.random() - 0.5) * 0.4;
+  this.vy = (Math.random() - 0.5) * 0.4;
+  this.r = Math.random() * 2 + 0.5;
+  this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  this.alpha = Math.random() * 0.6 + 0.15;
+}
+
+function initParticles() {
+  particles = [];
+  const n = Math.floor(W * H / 8000);
+  for (let i = 0; i < n; i++) particles.push(new Particle());
+}
+initParticles();
+
+window.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+});
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  for (let i = 0; i < particles.length; i++) {
+    const p = particles[i];
+    // Gentle mouse repulsion
+    const dx = mouse.x - p.x, dy = mouse.y - p.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 120) {
+      p.vx -= dx / dist * 0.12;
+      p.vy -= dy / dist * 0.12;
+    }
+    p.vx *= 0.98; p.vy *= 0.98;
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
+    // Draw dot
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.alpha;
+    ctx.fill();
+
+    // Draw connections
+    for (let j = i + 1; j < particles.length; j++) {
+      const q = particles[j];
+      const ex = p.x - q.x, ey = p.y - q.y;
+      const ed = Math.sqrt(ex * ex + ey * ey);
+      if (ed < 100) {
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+        ctx.strokeStyle = '#4F46E5';
+        ctx.globalAlpha = (1 - ed / 100) * 0.12;
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* ── SCROLL REVEAL ── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ── COUNT-UP ANIMATION ── */
+function countUp(el, target, suffix = '') {
+  let start = 0;
+  const step = target / 60;
+  const interval = setInterval(() => {
+    start += step;
+    if (start >= target) { el.textContent = target + suffix; clearInterval(interval); return; }
+    el.textContent = Math.floor(start) + suffix;
+  }, 16);
+}
+
+const statsObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('[data-target]').forEach(el => {
+        countUp(el, parseInt(el.dataset.target), el.dataset.target == '98' ? '%' : '+');
+      });
+      statsObs.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+const statsBar = document.querySelector('.stats-bar');
+if (statsBar) statsObs.observe(statsBar);
+
+/* ── NAV BG ON SCROLL ── */
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.background =
+    window.scrollY > 80 ? 'rgba(8,12,20,0.95)' : 'rgba(8,12,20,0.6)';
+});
+</script>
+</body>
+</html>
